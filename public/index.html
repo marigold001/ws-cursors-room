@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    var app = new Vue({
+      el:'#app',
+      data(){
+        return {
+          ws: new WebSocket('ws://localhost:3200'),
+          id:'',
+          newPosition:{
+
+          },
+          backgroundColor:''
+        }
+      },
+      methods:{
+        cursorMove() {
+          document.addEventListener('pointermove',(e)=>{
+            console.log('move');
+          })          
+        }
+      },
+      mounted(){
+        this.ws.addEventListener('open',()=>{
+          console.log('You have connected to the server');
+        })
+        
+        this.ws.addEventListener('message',(msg)=>{
+          if(JSON.parse(msg.data).removeId){
+            console.log('User number: ' + JSON.parse(msg.data).removeId + ' has left. Removing div-' + JSON.parse(msg.data).removeId);
+            var removeDiv = document.querySelector('#div-'+JSON.parse(msg.data).removeId);
+            removeDiv.parentNode.removeChild(removeDiv);
+          } else {
+            this.id = JSON.parse(msg.data).id;
+            if(!document.querySelector('#div-'+ this.id)){
+              var div = document.createElement('div');
+              div.classList.add('cursor-div');
+              div.setAttribute('id','div-'+this.id)
+              document.querySelector('body').appendChild(div)
+            } 
+            var div = document.querySelector('#div-'+this.id);
+            div.style='position: absolute; top:'+ JSON.parse(msg.data).y +'px; left:'+ JSON.parse(msg.data).x +'px; background-color:'+ JSON.parse(msg.data).backgroundColor;
+          }
+
+        })
+        this.ws.addEventListener('close',()=>{
+          console.log('You have been disconnected from the server.')
+        })
+
+        document.addEventListener('pointermove',(e)=>{
+            this.newPosition.x = e.clientX - 12,
+            this.newPosition.y = e.clientY - 12;
+            this.ws.send(JSON.stringify(this.newPosition));
+        })
+      }
+    })
+  </script>
+</body>
+</html>

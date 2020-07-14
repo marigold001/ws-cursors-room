@@ -1,0 +1,13 @@
+body {
+  margin:0;
+  padding: 0;
+  cursor: none;
+  box-sizing: border-box;
+}
+
+.cursor-div {
+  width:24px;
+  height:24px;
+  border-radius: 50%;
+  /* background-color: red; */
+}
