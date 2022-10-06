@@ -1,1 +1,3 @@
-# WBD5204-cursor-room
+# ws-cursors-room
+
+A websocket room where users cursors are shown
